@@ -15,14 +15,13 @@ struct CatResponse: Codable {
     var width: Int
     var height: Int
 }
-var catArray: [Any] = []
 
 // MARK: This code works.
 func fetchCat(completionHandler: @escaping (CatResponse) -> Void) {
     // This function will return a CatResponse object, we can then load the image from it's url.
     // API url: (We should always use URLComponents instead of URL(string:)
     var comps = URLComponents()
-    // this works in xcode simulator but not on physical iphone. the url is returned as "https" only:
+    // this works in xcode simulator but not on physical iphone I don't know why. the url is returned as "https" only:
     /*
      comps.scheme = "https"
      comps.host = "api.thecatapi.com/v1/images/search"
@@ -58,7 +57,7 @@ func fetchCat(completionHandler: @escaping (CatResponse) -> Void) {
 }
 
 struct CatView: View {
-    @State var catImageURL: URL?
+    @State var catImageURL: URL? // the @State makes this variable mutable and it updates the view everytime the url changes.
     var body: some View {
         VStack{
             Text("Cat API Call demo. Generates a random cat image. used https://docs.thecatapi.com.")
@@ -72,7 +71,7 @@ struct CatView: View {
                     .frame(width: 300, height: 300)
                     .clipped() // so the image doesn't escape the frame.
             } placeholder: {
-                // placeholder if nil or loading
+                // placeholder if nil
                 VStack{
                     Text("Image Placholder")
                     Text("Press the button to load image.")
@@ -81,8 +80,10 @@ struct CatView: View {
             }
 
             Button {
+                // we can see how the completionHandler @escaping function works here. it returns a CatResponse object for us to work with here. we don't need to return anything and that is why it is @escaping (CatResponse) -> Void.
                 fetchCat { cat in
                     catImageURL = URL(string: cat.url)
+                    // don't need to return anything because this function returns Void.
                 }
             } label: {
                 VStack{
@@ -101,6 +102,7 @@ struct CatView: View {
     }
 }
 
+// This is just for the simulator.
 struct CatView_Previews: PreviewProvider {
     static var previews: some View {
         CatView()
